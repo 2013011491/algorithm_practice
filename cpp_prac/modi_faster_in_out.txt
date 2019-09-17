@@ -1,0 +1,8 @@
+cin.tie(NULL);
+		ios::sync_with_stdio(false);
+입출력 빠르게 하는 코드
+
+cout.setf(ios::fixed);
+	cout.precision(3);
+
+소수점 정밀출력
