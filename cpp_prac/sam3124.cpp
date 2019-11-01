@@ -1,84 +1,66 @@
-#include<iostream>
-#include<set>
-#include<array>
+#include <iostream>
+#include <vector>
+#include <array>
+#include <algorithm>
 
 using namespace std;
 
-int visited[100001];
-struct classcomp
+
+bool arraycomp(array<int,3> lhs, array<int,3> rhs) 
 {
-    bool operator() (const array<int,3> lhs, const array<int,3> rhs) const
-    {
-        if(lhs[2]<rhs[2])
-        {
-            return true;
-        }else if(lhs[2]==rhs[2])
-        {
-            if(lhs[0]<rhs[0])
-            {
-                return true;
-            }else if(lhs[0]==rhs[0])
-            {
-                if(lhs[1]<rhs[1]) return true;
-                else return false;
-            }else return false;
-        }else return false;
-        
-    }
-};
+    return lhs[2]>rhs[2];
+}
+
+int vertex[100002];
+
+int find_ele(int x)
+{
+    if(vertex[x]==x) return x;
+    else return vertex[x]=find_ele(vertex[x]);
+}
 
 int main(void)
 {
     cin.tie(NULL);
     ios::sync_with_stdio(false);
 
-    int t,v,e;
-    int st,end,val;
+    int t;
     cin>>t;
-    for(int tc=0; tc<t; tc++)
+    for(int tc=1; tc<=t; tc++)
     {
+        cout<<"#"<<tc<<" ";
+        int v,e,s,d,w;
+        long long answer=0;
         cin>>v>>e;
-        for(int i=0; i<=v; i++) visited[i]=0;
-        set<array<int,3>,classcomp> bucket;
+        for(int i=1; i<=v; i++) vertex[i]=i;
+        vector<array<int,3>> bucket;
+
         for(int i=0; i<e; i++)
-        {
-            cin>>st>>end>>val;
-            bucket.insert({st,end,val});
+        {  
+            cin>>s>>d>>w;
+            bucket.push_back({s,d,w});
         }
-        cout<<"#"<<tc+1<<" ";
-
-        //start
-        array<int,3> pres;
-        int sum=0;
-        int k=1;
-        for(set<array<int,3>>::iterator it=bucket.begin(); it!=bucket.end(); ++it)
+        sort(bucket.begin(),bucket.end(),arraycomp);
+        /*for(int i=0; i<e; i++)
         {
-            pres=*it;
-            if(visited[pres[0]]==visited[pres[1]])
+            for(int j=0; j<3; j++) cout<<bucket[i][j]<<" ";
+            cout<<"\n";
+        }*/
+        int check=0;
+        while(check!=v-1)
+        {
+            array<int,3> pres=bucket.back();
+            bucket.pop_back();
+            int first=find_ele(pres[0]);
+            int second=find_ele(pres[1]);
+            if(first!=second)
             {
-                if(visited[pres[0]]==0   && visited[pres[1]]==0)
-                {
-                    visited[pres[0]]=k;
-                    visited[pres[1]]=k;
-                    k++;
-                }else continue;
-            }else
-            {
-                if(visited[pres[0]]==0) visited[pres[0]]=visited[pres[1]];
-                else if(visited[pres[1]]==0) visited[pres[1]]=visited[pres[0]];
-                else
-                {
-                    int temp=visited[pres[1]];
-                    for(int i=1; i<=v; i++)
-                    {
-                        if(visited[i]==temp) visited[i]=visited[pres[0]];
-                    }
-                }
+                vertex[second]=first;
+                answer+=pres[2];
+                check++;
             }
-            sum+=pres[2];
         }
-        cout<<sum<<"\n";
+        cout<<answer<<"\n";
     }
-
     return 0;
 }
