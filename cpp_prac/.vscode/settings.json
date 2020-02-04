@@ -11,6 +11,7 @@
         "vector": "cpp",
         "xtree": "cpp",
         "ios": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "iostream": "cpp"
     }
 }
