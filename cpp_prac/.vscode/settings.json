@@ -12,6 +12,7 @@
         "xtree": "cpp",
         "ios": "cpp",
         "tuple": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "xiosbase": "cpp"
     }
 }
