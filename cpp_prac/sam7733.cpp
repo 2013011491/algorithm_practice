@@ -1,5 +1,5 @@
 //200212 20:25 start D4 42.60%  21:18 53min
-//역시 dfs가 답
+//역시 dfs가 답, 쓸데없이 copy함 그냥 배열 하나를 더만들었으면 됐었음.
 #include<iostream>
 #include<array>
 #include<algorithm>
