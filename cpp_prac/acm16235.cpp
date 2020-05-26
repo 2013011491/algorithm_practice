@@ -1,6 +1,7 @@
 //200512 for swexpert gold4 
 #include<iostream>
 #include<array>
+#include<vector>
 #include<algorithm>
 
 using namespace std;
@@ -13,7 +14,7 @@ typedef struct ground
     int nutri;
     int dead;
     int tnum;
-    array<int,103> trees;
+    vector<int> trees;
 }ground;
 ground board[12][12];
 
@@ -47,7 +48,6 @@ void spring()
                         board[i][j].trees[q]=0;
                         board[i][j].tnum--;                        
                     }
-                    break;
                 }
                 
             }
@@ -84,7 +84,12 @@ void autumn()
                 {
                     int nx=i+way[w][0], ny=j+way[w][1];
                     if(nx<0 || ny<0 || nx>=n || ny>=n) continue;
-                    for(int q=0; q<brednum; ++q){board[nx][ny].trees[board[nx][ny].tnum]=1; board[nx][ny].tnum++;}
+                    for(int q=0; q<brednum; ++q)
+                    {
+                        if(board[nx][ny].trees.size()<=board[nx][ny].tnum) board[nx][ny].trees.push_back(1);
+                        else board[nx][ny].trees[board[nx][ny].tnum]=1; 
+                        board[nx][ny].tnum++;
+                    }
                 }
             }
         }
@@ -112,6 +117,8 @@ void printstat()
         for(int j=0; j<n; ++j){cout<<board[i][j].dead<<" ";}
         cout<<"      ";
         for(int j=0; j<n; ++j){cout<<board[i][j].tnum<<" ";}
+        cout<<"      ";
+        for(int j=0; j<n; ++j){cout<<board[i][j].trees[board[i][j].tnum-1]<<" ";}
         cout<<"\n";
     }
 }
@@ -132,7 +139,7 @@ int main(void)
     {
         int x,y,z;
         cin>>x>>y>>z;
-        board[x-1][y-1].trees[board[x-1][y-1].tnum]=z;
+        board[x-1][y-1].trees.push_back(z);
         board[x-1][y-1].tnum++;
     }
     //printstat();
@@ -140,6 +147,7 @@ int main(void)
     for(int i=0; i<k; ++i){oneyear();}
     int ans=0;
     for(int i=0; i<n; ++i){for(int j=0; j<n; ++j){if(board[i][j].tnum!=0) ans+=board[i][j].tnum;}}
+    //printstat();
     cout<<ans;
     
     return 0;

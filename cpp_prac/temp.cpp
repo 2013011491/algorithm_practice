@@ -1,85 +1,95 @@
-#include<iostream>
-#include<string>
 #include<vector>
+#include<algorithm>
+#include<stack>
+#include<array>
+#include<iostream>
 
 using namespace std;
 
+vector<vector<int>> nboard;
+int way[4][2]={{-1,0},{1,0},{0,1},{0,-1}};
+int ans=0;
+int n;
+
+int checkmax()
+{
+    int max=0;
+    for(int i=0; i<n; ++i){for(int j=0; j<n; ++j){if(nboard[i][j]>max) max=nboard[i][j];}}
+    if(max>ans) ans=max;
+    return max;
+}
+
+void move(int w)
+{
+    for(int i=0; i<n; ++i)
+    {
+        stack<int> bucket;
+        array<int,2> stp;
+        array<int,2> index;
+        if(w==0){ stp={n-1,i}; index={n-1,i};}
+        else if(w==1){stp={0,i}; index={0,i};}
+        else if(w==2){stp={i,0}; index={i,0};}
+        else if(w==3){stp={i,n-1}; index={i,n-1};}
+        
+        for(int j=0; j<n; ++j)
+        {
+            if(nboard[stp[0]][stp[1]]==0){stp[0]+=way[w][0]; stp[1]+=way[w][1]; continue;}
+            if(bucket.empty()){ bucket.push(nboard[stp[0]][stp[1]]); nboard[stp[0]][stp[1]]=0;}
+            else
+            {
+                int topp=bucket.top();
+                int pres=nboard[stp[0]][stp[1]];
+                nboard[stp[0]][stp[1]]=0;
+                bucket.pop();
+                if(topp==pres) nboard[index[0]][index[1]]=(pres<<1);
+                else
+                {
+                    nboard[index[0]][index[1]]=topp;
+                    bucket.push(pres);
+                }
+                index[0]+=way[w][0]; index[1]+=way[w][1];
+            }
+            stp[0]+=way[w][0]; stp[1]+=way[w][1];
+        }
+        if(!bucket.empty()) nboard[index[0]][index[1]]=bucket.top();
+    }
+}
+
+void dfs(int depth)
+{
+    if(depth>5) return;
+    int maxv=checkmax();
+    if((maxv<<(5-depth))<=ans) return;
+    vector<vector<int>> oboard;
+    oboard.clear();
+    oboard.assign(nboard.begin(),nboard.end());
+    for(int i=0; i<4; ++i)
+    {
+        move(i);
+        dfs(depth+1);
+        nboard.clear();
+        nboard.assign(oboard.begin(),oboard.end());
+    }
+}
+
 int main(void)
 {
-    //cin.tie(NULL);
-    //ios::sync_with_stdio(false);
-
-    int oplen;
-    string op;
-    for(int tc=1; tc<=1; ++tc)
+    cin>>n;
+    
+    for(int i=0; i<n; ++i)
     {
-        cout<<"#"<<tc<<" ";
-        
-        cin>>oplen>>op;
-
-        int pres;
-        vector<char> oper;
-        vector<int> num;
-
-        for(int i=0; i<oplen; ++i)
+        vector<int> rows;
+        for(int j=0; j<n; ++j)
         {
-            cout<<i<<"\n";
-            if(op[i]=='(') oper.push_back('(');
-            else if(op[i]=='+')
-            { 
-                oper.push_back('+');
-            }else if(op[i]=='*')
-            {
-                if(op[i+1]=='(')
-                {
-                    oper.push_back('*');
-                }else
-                {
-                    pres=num.back();
-                    num.pop_back();
-                    pres*=(op[i+1]-'0');
-                    num.push_back(pres);
-                    ++i;
-                }
-            }else if(op[i]==')')
-            {
-                cout<<i<<" ";
-                while(oper.back()!='(')
-                {
-                    oper.pop_back();
-                    pres=num.back();
-                    num.pop_back();
-                    pres+=num.back();
-                    num.pop_back();
-                    num.push_back(pres);
-                }
-                oper.pop_back();
-                if(!oper.empty() && oper.back()=='*')
-                {
-                    pres=num.back();
-                    num.pop_back();
-                    pres*=num.back();
-                    num.pop_back();
-                    num.push_back(pres);
-                }
-            }else
-            {
-                num.push_back(op[i]-'0');
-            }
-
-            for(int j=0; j<oper.size(); ++j){ cout<<oper[j]<<" ";}
-            cout<<"\n";
-            for(int j=0; j<num.size(); ++j){ cout<<num[j]<<" ";}
-            cout<<"\n";
-            
+            int temp;
+            cin>>temp;
+            rows.push_back(temp);
         }
-        pres=0;
-        while(!num.empty())
-        {
-            pres+=num.back();
-            num.pop_back();
-        }
-        cout<<pres<<"\n";
+        nboard.push_back(rows);
     }
-    return 0;
+    dfs(0);
+    cout<<ans;
+	return 0;
 }
+
+
