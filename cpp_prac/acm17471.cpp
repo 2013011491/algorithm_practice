@@ -1,102 +1,81 @@
-//2019-11-13 18:58
-#include <iostream>
-#include <queue>
-#include <vector>
+//200603 forsds gold5   fail! restart 0604
+#include<iostream>
+#include<stack>
+#include<cmath>
 
 using namespace std;
 
+int n;
 int popul[11]={0,};
-int graph[11][11]={0,};
+int city[11][11]={0,};
+int ans=1000000;
+
+void dfs()
+{
+    int limit = (1<<n)-1;
+    for(int i=1; i<limit; ++i)
+    {
+        int visit[11]={0,};
+        int origin=i;
+        stack<int> bucket;
+        int section[2]={1,1};
+        int sum[2]={0,0};
+
+        for(int j=0; j<n; ++j)
+        {
+            visit[j]=origin%2;
+            origin=(origin>>1);
+        }
+        for(int t=0; t<2; ++t)
+        {
+            for(int j=0; j<n; ++j)
+            {
+                if(visit[j]==t)
+                {
+                    bucket.push(j);
+                    visit[j]=t+2;
+                    sum[t]+=popul[j];
+                    while(!bucket.empty())
+                    {
+                        int pres=bucket.top();
+                        bucket.pop();
+                        for(int k=0; k<n; ++k)
+                        {
+                            if(city[pres][k]==1 && visit[k]==t)
+                            {
+                                visit[k]=t+2;
+                                bucket.push(k);
+                                section[t]++;
+                                sum[t]+=popul[k];
+                            } 
+                        }
+                    }
+                    break;
+                }   
+            }
+        }
+        
+        if((section[0]+section[1]==n) && (ans>abs(sum[0]-sum[1]))) ans=abs(sum[0]-sum[1]);
+    }
+}
 
 int main(void)
 {
-    int n;
-    int ans=60000;
     cin>>n;
-    queue<vector<int>> bucket;
-    for(int i=0; i<n; ++i)
-    {
-        int temp;
-        cin>>temp;
-        popul[i]=temp;
-    }
+    for(int i=0; i<n; ++i){cin>>popul[i];}
     for(int i=0; i<n; ++i)
     {
         int temp;
         cin>>temp;
         for(int j=0; j<temp; ++j)
         {
-            int temp2;
-            cin>>temp2;
-            graph[i][temp2-1]=1;
-            graph[temp2-1][i]=1;
+            int dest;
+            cin>>dest;
+            city[i][dest-1]=1;
         }
     }
-
-    //start
-    bucket.push({0});
-    while(!bucket.empty())
-    {
-        int visited[11]={0,};
-        vector<int> pres=bucket.front();
-        bucket.pop();
-        for(int i=0; i<pres.size(); ++i){visited[pres[i]]=1;}
-        for(int j=0; j<n; ++j)
-        {
-            if(graph[pres[pres.size()-1]][j]==1 && !visited[j])
-            {
-                vector<int> t=pres;
-                t.push_back(j);
-                bucket.push(t);
-            }
-        }
-        
-        queue<int> temp;
-        for(int i=0; i<n; ++i)
-        {
-            if(!visited[i])
-            {
-                temp.push(i);
-                break;
-            }
-        }
-
-        while(!temp.empty())
-        {
-            int qhead=temp.front();
-            temp.pop();
-            if(!visited[qhead])
-            {
-                visited[qhead]=2;
-                for(int i=0; i<n; ++i)
-                {
-                    if(graph[qhead][i]==1) temp.push(i);
-                }
-            } 
-        }
-        int check=0;
-        int sum1=0,sum2=0;
-        for(int i=0; i<n; ++i)
-        {
-            if(visited[i]==1) sum1+=popul[i];
-            else if(visited[i]==2) sum2+=popul[i];
-            else
-            {
-                check=1;
-                break;
-            }   
-        }
-        if(!check)
-        {
-            int sub;
-            if(sum1>sum2) sub=sum1-sum2;
-            else sub=sum2-sum1;
-
-            if(ans>sub) ans=sub;
-        }
-    }
-    if(ans==60000) cout<<-1;
-    else cout<<ans;
-
+    dfs();
+    if(ans==1000000) ans=-1;
+    cout<<ans;
     return 0;
 }
